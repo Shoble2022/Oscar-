@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oscar+ | Welcome</title>
+    <style>
+      .container {
+        text-align: center;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body onLoad="statusCheck()">
+    <div class="container">
+      <h1>Welcome to Oscar+</h1>
+      <br />
+      <button
+        onclick="enrollNewUser()"
+        title="Enroll a new user on this FACEIO application"
+      >
+        Enroll New User
+      </button>
+    </div>
+    <div id="faceio-modal"></div>
+    <script src="https://cdn.faceio.net/fio.js"></script>
+    <script type="text/javascript">
+      function statusCheck() {
+        console.log("statusCheck is called");
+        let status = localStorage.getItem("status");
+        if (status != "yes") {
+          window.location.replace("./");
+        }
+      }
+      // Initialize the library first with your application Public ID.
+      // Grab your public ID from the Application Manager on the FACEIO console at: https://console.faceio.net/
+      const faceio = new faceIO("fioac4a8"); // Replace with your application Public ID
+      function enrollNewUser() {
+        // Start the facial enrollment process
+        faceio
+          .enroll({
+            locale: "auto", // Default user locale
+            userConsent: false, // Set to true if you have already collected user consent
+            payload: {
+              /* The payload we want to associate with this particular user
+               * which is forwarded back to us on each of his future authentication...
+               */
+              whoami: 123456, // Example of dummy ID linked to this particular user
+              email: "john.doe@example.com",
+            },
+          })
+          .then((userInfo) => {
+            // User Successfully Enrolled!
+            console.log(
+              `User Successfully Enrolled! Details:
+			        Unique Facial ID: ${userInfo.facialId}
+			        Enrollment Date: ${userInfo.timestamp}
+			        Gender: ${userInfo.details.gender}
+			        Age Approximation: ${userInfo.details.age}`
+            );
+            console.log(userInfo);
+            // handle success, save the facial ID, redirect to dashboard...
+          })
+          .catch((errCode) => {
+            // handle enrollment failure. Visit:
+            // https://faceio.net/integration-guide#error-codes
+            // for the list of all possible error codes
+            handleError(errCode);
+          });
+      }
+    </script>
+  </body>
+</html>
